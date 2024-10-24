@@ -1,12 +1,20 @@
 package pages;
 
 import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.*;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public class CommonPage {
 
@@ -129,12 +137,70 @@ public class CommonPage {
         }
     }
 
+    /**
+     * Returns page title of the current page
+     * @return
+     */
     public String getPageTitle() {
         try {
             return driver.getTitle();
         } catch (Exception exception) {
             exception.printStackTrace();
             throw new RuntimeException("Failed to retrieve page tile." + exception.getMessage());
+        }
+    }
+
+    /**
+     * Use this method to explicitly wait for a web element with a given timeout
+     * @param element
+     * @param timeoutInSeconds
+     */
+    public void waitForElement(WebElement element, int timeoutInSeconds) {
+        try {
+            WebDriverWait explicitWait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+            explicitWait.until(ExpectedConditions.visibilityOf(element));
+        } catch (Exception exception) {
+            System.out.println("Error occurred while waiting for a web element" + exception.getMessage());
+            exception.printStackTrace();
+        }
+    }
+
+    /**
+     * Use this method to switch to a child window by providing the parent window ID as an argument
+     * @param parentWindowId
+     */
+    public void switchToChildWindow(String parentWindowId) {
+        Set<String> windowIds = null;
+        try {
+            waitForChildWindow(5);
+            windowIds = driver.getWindowHandles();
+            Optional<String> childWindowId = windowIds.stream().filter(entry -> !entry.equalsIgnoreCase(parentWindowId)).findFirst();
+            if(childWindowId.isPresent())
+                driver.switchTo().window(childWindowId.get());
+            else
+                throw new RuntimeException("No child window present");
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            if(windowIds != null && windowIds.size() > 2)
+                throw new RuntimeException("2 or More than 2 child windows are present. Expecting only one child window");
+            else if (windowIds != null && windowIds.size() == 1)
+                throw new RuntimeException("No child window present to switch to");
+            else
+                throw new RuntimeException("Error occurred while trying to switch to child window. " + exception.getMessage());
+        }
+    }
+
+    /**
+     * Waits for the child window to open(number of windows to be 2)
+     * @param timeout
+     */
+    public void waitForChildWindow(int timeout) {
+        try {
+            WebDriverWait windowWait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
+            windowWait.until(ExpectedConditions.numberOfWindowsToBe(2));
+        } catch (Exception exception) {
+            System.out.println("Error occurred while waiting for a child window" + exception.getMessage());
+            exception.printStackTrace();
         }
     }
 
