@@ -1,16 +1,13 @@
 package utils;
 
 import org.openqa.selenium.WebDriver;
-import pages.CommonPage;
-import pages.HomePage;
-import pages.LoginPage;
-import pages.MyMessagesPage;
+import pages.*;
 
 public class PageObjectManager {
 
     private HomePage homePage;
     private LoginPage loginPage;
-    private MyMessagesPage myMessagesPage;
+    private OrgDetailsPage orgDetailsPage;
     private CommonPage commonPage;
 
     public HomePage getHomePage(WebDriver driver) {
@@ -21,8 +18,8 @@ public class PageObjectManager {
         return loginPage == null ? new LoginPage(driver) : loginPage;
     }
 
-    public MyMessagesPage getMyMessagesPage(WebDriver driver) {
-        return myMessagesPage == null ? new MyMessagesPage(driver) : myMessagesPage;
+    public OrgDetailsPage orgDetailsPage(WebDriver driver) {
+        return orgDetailsPage == null ? new OrgDetailsPage(driver) : orgDetailsPage;
     }
 
     public CommonPage getCommonPage(WebDriver driver) {

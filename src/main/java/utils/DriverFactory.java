@@ -32,6 +32,7 @@ public class DriverFactory {
         }
         WebDriver driver = driverMap.get(browser.toUpperCase()).get();
         driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
         return driver;
     }
 

@@ -12,18 +12,13 @@ public class HomePage extends CommonPage {
         PageFactory.initElements(driver, this);
     }
 
-    @FindBy(xpath = "//a[contains(@href,'news')]")
-    private WebElement newsLink;
+    @FindBy(css = "#onetrust-banner-sdk button#onetrust-accept-btn-handler")
+    private WebElement acceptCookieBtn;
 
-    @FindBy(xpath = "//a[contains(@href,'my_messages')]")
-    private WebElement myMessagesLink;
-
-    public void clickNewsLink() {
-        clickElement(newsLink);
-    }
-
-    public void clickMyMessagesLink() {
-        clickElement(myMessagesLink);
+    public void acceptCookies() {
+        waitForElement(acceptCookieBtn, 10);
+        System.out.println("Clicking on \"Yes, I Agree\" button on the Cookies overlay");
+        clickElement(acceptCookieBtn);
     }
 
 }

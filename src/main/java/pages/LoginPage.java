@@ -12,18 +12,34 @@ public class LoginPage extends CommonPage {
         PageFactory.initElements(driver, this);
     }
 
-    @FindBy(css = "input[name='login']")
+    @FindBy(css = "input#userIdTxt")
     private WebElement userNameTextBox;
 
-    @FindBy(css = "input[name='password']")
+    @FindBy(css = "input#passwordTxt")
     private WebElement passwordTextBox;
 
-    @FindBy(css = "input[type='submit']")
-    private WebElement goButton;
+    @FindBy(css = "button#submitBtn")
+    private WebElement loginBtn;
+
+    @FindBy(css = "input[name='verifiedCode']")
+    private WebElement otpTextBox;
+
+    @FindBy(css = "button#verifyBtn")
+    private WebElement confirmOtpBtn;
 
     public void performLogin(String username, String password) {
+        waitForElement(userNameTextBox, 10);
         inputText(userNameTextBox, username);
         inputText(passwordTextBox, password);
-        clickElement(goButton);
+        clickElement(loginBtn);
+        waitForPageToLoad(5);
     }
+
+   public void enterOtp(String otp) {
+        waitForElement(otpTextBox, 10);
+        System.out.println("Entering OTP");
+        inputText(otpTextBox, otp);
+        clickElement(confirmOtpBtn);
+        waitForPageToLoad(5);
+   }
 }
