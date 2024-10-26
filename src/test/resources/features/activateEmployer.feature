@@ -1,5 +1,7 @@
+@employer
 Feature: Activate Employer
 
+  @activate_employer
   Scenario: ActivateEmployer;As an admin I should be able to activate a new employer
     Given User is on login page
     When User logs in with username as "santosh.sri55" and password as "Testing@1234"

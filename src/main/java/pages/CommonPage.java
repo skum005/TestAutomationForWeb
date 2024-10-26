@@ -1,6 +1,9 @@
 package pages;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -10,13 +13,13 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.time.Duration;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 public class CommonPage {
 
     WebDriver driver;
+    private static final Logger logger = LogManager.getLogger(CommonPage.class);
 
     public CommonPage(WebDriver driver) {
         this.driver = driver;
@@ -29,6 +32,7 @@ public class CommonPage {
      */
     public void clickElement(WebElement element) {
         try {
+            logger.info("Clicking on a web element");
             element.click();
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -43,6 +47,7 @@ public class CommonPage {
      */
     public void inputText(WebElement textBoxElement, String inputText) {
         try {
+            logger.info("Entering text " + inputText + " into a textbox/text area");
             textBoxElement.sendKeys(inputText);
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -57,6 +62,7 @@ public class CommonPage {
      */
     public void selectFromDropdown(WebElement dropdownElement, String visibleText) {
         try {
+            logger.info("Selecting a value : " + visibleText + " from a dropdown");
             Select select = new Select(dropdownElement);
             select.selectByVisibleText(visibleText);
         } catch (Exception exception) {
@@ -69,41 +75,14 @@ public class CommonPage {
         }
     }
 
-    /**
-     * Select a value from a dropdown
-     * @param dropdownElement
-     * @param dropdownValueElements
-     * @param desiredValue
-     */
-    public void selectFromDropdown_NonSelectElements(WebElement dropdownElement, List<WebElement> dropdownValueElements, String desiredValue) {
-        boolean isClicked = false;
-        try {
-            clickElement(dropdownElement);
-            waitForPageToLoad(5);
-            for (WebElement element : dropdownValueElements) {
-                String text = extractTextFromElement(element);
-                System.out.println(text);
-                if (text.equalsIgnoreCase(desiredValue)) {
-                    clickElement(element);
-                    isClicked = true;
-                    break;
-                }
-            }
-            if(!isClicked)
-                throw new RuntimeException("Failed to select a value from dropdown");
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            throw new RuntimeException("Failed to select a value from dropdown" + exception.getMessage());
-        }
-    }
-
-    /**
+   /**
      * Extracts text from the given web element
      * @param element
      * @return
      */
     public String extractTextFromElement(WebElement element) {
         try {
+            logger.info("Extracting text from a web element");
             return element.getText();
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -117,6 +96,7 @@ public class CommonPage {
      */
     public void captureScreenshot(String fileName) {
         try {
+            logger.info("Capturing screenshot and saving it in the path: " + fileName);
             File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
             FileUtils.copyFile(screenshot, new File(fileName));
         } catch (Exception exception) {
@@ -131,6 +111,7 @@ public class CommonPage {
      */
     public void loadWebsite(String _URL) {
         try {
+            logger.info("Launching website : " + _URL);
             driver.get(_URL);
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -144,6 +125,7 @@ public class CommonPage {
      */
     public String getPageTitle() {
         try {
+            logger.info("Extracting page title from the browser");
             return driver.getTitle();
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -157,12 +139,12 @@ public class CommonPage {
      * @param timeoutInSeconds
      */
     public void waitForElement(WebElement element, int timeoutInSeconds) {
-        System.out.println("Waiting for the page to load");
+        logger.info("Waiting for the page to load");
         try {
             WebDriverWait explicitWait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
             explicitWait.until(ExpectedConditions.visibilityOf(element));
         } catch (Exception exception) {
-            System.out.println("Error occurred while waiting for a web element" + exception.getMessage());
+            logger.error("Error occurred while waiting for a web element" + exception.getMessage());
             exception.printStackTrace();
         }
     }
@@ -172,13 +154,16 @@ public class CommonPage {
      * @param parentWindowId
      */
     public void switchToChildWindow(String parentWindowId) {
+        logger.info("Finding child window ID with the help of given parent window ID");
         Set<String> windowIds = null;
         try {
             waitForChildWindow(5);
             windowIds = driver.getWindowHandles();
             Optional<String> childWindowId = windowIds.stream().filter(entry -> !entry.equalsIgnoreCase(parentWindowId)).findFirst();
-            if(childWindowId.isPresent())
+            if(childWindowId.isPresent()) {
+                logger.info("Switching to child window ID: " + childWindowId.get());
                 driver.switchTo().window(childWindowId.get());
+            }
             else
                 throw new RuntimeException("No child window present");
         } catch (Exception exception) {
@@ -198,35 +183,54 @@ public class CommonPage {
      */
     public void waitForChildWindow(int timeout) {
         try {
+            logger.info("Waiting for child window ID");
             WebDriverWait windowWait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
             windowWait.until(ExpectedConditions.numberOfWindowsToBe(2));
         } catch (Exception exception) {
-            System.out.println("Error occurred while waiting for a child window" + exception.getMessage());
+            logger.error("Error occurred while waiting for a child window" + exception.getMessage());
             exception.printStackTrace();
         }
     }
 
+
+    /**
+     * Waits for a page to load by checking document ready state
+     * @param timeoutInSeconds
+     */
     public void waitForPageToLoad(int timeoutInSeconds) {
         try {
+            logger.info("Waiting for the page to load");
             WebDriverWait pageloadWait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
             pageloadWait.until((ExpectedCondition<Boolean>) wd ->
                     ((JavascriptExecutor) wd).executeScript("return document.readyState").equals("complete"));
         } catch (Exception exception) {
+            logger.error("Failed to wait for the page to load" + exception.getMessage());
             exception.printStackTrace();
         }
     }
 
+
+    /**
+     * Scrolls to an element
+     * @param element
+     */
     public void scrollToElement(WebElement element) {
-        System.out.println("Scrolling to an element");
+        logger.info("Scrolling to an element");
         try {
             executeJS("arguments[0].scrollIntoView(true);", element);
         } catch (Exception exception) {
-
+            exception.printStackTrace();
+            logger.error("Failed to scroll to element" + exception.getMessage());
         }
     }
 
+    /**
+     * Executes javascript on a web element
+     * @param script
+     * @param element
+     */
     public void executeJS(String script, WebElement element) {
-        System.out.println("Executing Javascript: " + script);
+        logger.error("Executing Javascript: " + script);
         try {
             JavascriptExecutor jsExec = (JavascriptExecutor) driver;
             jsExec.executeScript(script, element);
@@ -234,6 +238,43 @@ public class CommonPage {
             exception.printStackTrace();
             throw new RuntimeException("Failed to execute script: " + script);
         }
+    }
+
+    /**
+     * This method can be used to temporarily change implicit wait time inorder to wait
+     * for desired element shorter/longer. Make sure to set the implicit wait back to
+     * default post performing required actions
+     * @param seconds
+     */
+    public void setImplicitWait(int seconds) {
+        try {
+            logger.info("Temporarily setting implicit wait time to : " + seconds + " seconds");
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(seconds));
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            logger.error("Error occurred while changing implicit wait time");
+        }
+    }
+
+    /**
+     * validates the presence of the given element. Return true if present, false otherwise
+     * @param element
+     * @return
+     */
+    public boolean isElementPresent(WebElement element) {
+        try {
+            logger.info("validating the presence of an element");
+            waitForPageToLoad(5);
+            setImplicitWait(5);
+            if (element.isDisplayed())
+                return true;
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            logger.error("Element not found");
+        } finally {
+            setImplicitWait(30);
+        }
+        return false;
     }
 
 }

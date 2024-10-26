@@ -1,5 +1,7 @@
 package pages;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -10,6 +12,8 @@ import java.util.Optional;
 import java.util.Random;
 
 public class OrgDetailsPage extends CommonPage {
+    
+    private static final Logger logger = LogManager.getLogger(OrgDetailsPage.class);
 
     public OrgDetailsPage(WebDriver driver) {
         super(driver);
@@ -71,20 +75,22 @@ public class OrgDetailsPage extends CommonPage {
     private WebElement applyButton;
 
     public void searchOrganization(String orgRegNum) {
+        logger.info("Entering Organisation Registration Number: " + orgRegNum);
         waitForElement(searchButton, 20);
-        System.out.println("Searching Organization using reg no: " + orgRegNum);
+        logger.info("Searching Organization using reg no: " + orgRegNum);
         inputText(regNoTextBox, orgRegNum);
         clickElement(searchButton);
     }
 
     public void enterTradingName(String tradingName) {
+        logger.info("Entering Trading Name: " + tradingName);
         waitForElement(tradingNameTextBox, 10);
-        System.out.println("Entering trading Name: " + tradingName);
+        logger.info("Entering trading Name: " + tradingName);
         inputText(tradingNameTextBox, tradingName);
     }
 
     public void enterAddressByPostcodeSearch(String postcode) {
-        System.out.println("Entering postcode: " + postcode + " and selecting random address from the result");
+        logger.info("Entering postcode: " + postcode + " and selecting random address from the result");
         inputText(postcodeTextBox, postcode);
         clickElement(searchButton_ForAddress);
         waitForElement(addressResultsLabel, 10);
@@ -92,7 +98,7 @@ public class OrgDetailsPage extends CommonPage {
     }
 
     public void selectTypeOfIndustry(String industryType) {
-        System.out.println("Selecting Industry Type: " + industryType);
+        logger.info("Selecting Industry Type: " + industryType);
         scrollToElement(industryTypeComboBox);
         clickElement(industryTypeComboBox);
         waitForPageToLoad(5);
@@ -109,7 +115,7 @@ public class OrgDetailsPage extends CommonPage {
     }
 
     public void selectNumOfWorkers(String numOfWorkers) {
-        System.out.println("Selecting Number of Workers: " + numOfWorkers);
+        logger.info("Selecting Number of Workers: " + numOfWorkers);
         scrollToElement(numOfWorkersComboBox);
         clickElement(numOfWorkersComboBox);
         waitForPageToLoad(5);
@@ -117,37 +123,37 @@ public class OrgDetailsPage extends CommonPage {
     }
 
     public void enterPayeeRefTextBox(String payeeRefNum) {
-        System.out.println("Entering PAYEE reference number: " + payeeRefNum);
+        logger.info("Entering PAYEE reference number: " + payeeRefNum);
         scrollToElement(payeeRefNumTextBox);
         inputText(payeeRefNumTextBox, payeeRefNum);
     }
 
     public void enterEmail(String email) {
-        System.out.println("Enter email address: " + email);
+        logger.info("Enter email address: " + email);
         scrollToElement(emailTextBox);
         inputText(emailTextBox, email);
     }
 
     public void selectTermsCheckbox() {
-        System.out.println("Selecting terms and privacy checkbox");
+        logger.info("Selecting terms and privacy checkbox");
         scrollToElement(termsAndPrivacyCheckbox);
         clickElement(termsAndPrivacyCheckbox);
     }
 
     public void clickContinueButton() {
-        System.out.println("Clicking on continue button");
+        logger.info("Clicking on continue button");
         clickElement(continueButton);
     }
 
     public void selectReferral(String referralName) {
-        System.out.println("Selecting a value from Where did you hear about us combo box");
+        logger.info("Selecting a value from Where did you hear about us combo box");
         clickElement(howDidYouHeadAbtUsComboBox);
         waitForPageToLoad(5);
         selectOptionFromComboBox(referralName);
     }
 
     public void selectRandomStagingDate() {
-        System.out.println("Selecting staging date");
+        logger.info("Selecting staging date");
         stagingDateCalIcon.click();
         waitForPageToLoad(2);
         clickElement(dates.get(new Random().nextInt(dates.size()-1)));

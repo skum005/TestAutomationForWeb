@@ -3,6 +3,13 @@ pipeline {
 
     stages {
 
+        stage('Check Allure Installation') {
+                steps {
+                    // Check if allure command is available
+                    sh 'allure --version'
+                }
+            }
+
         stage('Checkout') {
             steps {
                 git branch : 'main', url : 'git@github.com:skum005/TestAutomationForWeb.git'

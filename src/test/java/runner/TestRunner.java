@@ -8,7 +8,7 @@ import org.testng.annotations.DataProvider;
         glue = {"stepdefinitions"},
         plugin = {"pretty", "html:target/cucumber-html/report.html", "json:target/cucumber-report.json",
                 "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"},
-        tags = "@login")
+        tags = "@activate_employer")
 public class TestRunner extends AbstractTestNGCucumberTests {
 
     @Override

@@ -1,7 +1,8 @@
 package utils;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.openqa.selenium.Platform;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -18,8 +19,10 @@ import java.util.function.Supplier;
 public class DriverFactory {
 
     private WebDriver driver;
+    private static final Logger logger = LogManager.getLogger(DriverFactory.class);
 
     public WebDriver createLocalDriver(String browser) {
+        logger.info("Creating " + browser + " instance on local machine to run tests");
         switch (browser.toUpperCase()) {
             case "CHROME" :
                 WebDriverManager.chromedriver().setup();
@@ -37,6 +40,7 @@ public class DriverFactory {
     }
 
     public WebDriver createRemoteDriver(String gridURL, String browserName, String browserVersion, String _os_name) {
+        logger.info("Creating " + browserName + "_" + browserVersion + " instance on remote machine(" + gridURL + ") with operating system: " + _os_name);
         try {
             WebDriver driver = new RemoteWebDriver(new URL(gridURL), getRemoteDriverCapabilities(browserName, browserVersion, _os_name));
             driver.manage().window().maximize();
