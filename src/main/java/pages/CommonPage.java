@@ -1,11 +1,9 @@
 package pages;
 
 import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -81,8 +79,11 @@ public class CommonPage {
         boolean isClicked = false;
         try {
             clickElement(dropdownElement);
+            waitForPageToLoad(5);
             for (WebElement element : dropdownValueElements) {
-                if (extractTextFromElement(element).equalsIgnoreCase(desiredValue)) {
+                String text = extractTextFromElement(element);
+                System.out.println(text);
+                if (text.equalsIgnoreCase(desiredValue)) {
                     clickElement(element);
                     isClicked = true;
                     break;
@@ -156,6 +157,7 @@ public class CommonPage {
      * @param timeoutInSeconds
      */
     public void waitForElement(WebElement element, int timeoutInSeconds) {
+        System.out.println("Waiting for the page to load");
         try {
             WebDriverWait explicitWait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
             explicitWait.until(ExpectedConditions.visibilityOf(element));
@@ -201,6 +203,49 @@ public class CommonPage {
         } catch (Exception exception) {
             System.out.println("Error occurred while waiting for a child window" + exception.getMessage());
             exception.printStackTrace();
+        }
+    }
+
+    /**
+     * Waits for a page to load by checking document ready state
+     * @param timeoutInSeconds
+     */
+    public void waitForPageToLoad(int timeoutInSeconds) {
+        try {
+            WebDriverWait pageloadWait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+            pageloadWait.until((ExpectedCondition<Boolean>) wd ->
+                    ((JavascriptExecutor) wd).executeScript("return document.readyState").equals("complete"));
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    /**
+     * Scrolls to an element
+     * @param element
+     */
+    public void scrollToElement(WebElement element) {
+        System.out.println("Scrolling to an element");
+        try {
+            executeJS("arguments[0].scrollIntoView(true);", element);
+        } catch (Exception exception) {
+
+        }
+    }
+
+    /**
+     * Executes javascript on a web element
+     * @param script
+     * @param element
+     */
+    public void executeJS(String script, WebElement element) {
+        System.out.println("Executing Javascript: " + script);
+        try {
+            JavascriptExecutor jsExec = (JavascriptExecutor) driver;
+            jsExec.executeScript(script, element);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw new RuntimeException("Failed to execute script: " + script);
         }
     }
 
